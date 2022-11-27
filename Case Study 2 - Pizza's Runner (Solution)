@@ -1,0 +1,23 @@
+/* PART - A PIZZA METRICS 
+
+1. How many pizzas were ordered? */
+SELECT * FROM pizza_toppings;
+SELECT * FROM pizza_names;
+SELECT * FROM pizza_recipes;
+SELECT * FROM customer_orders;
+SELECT * FROM runner_orders;
+SELECT * FROM runners;
+SELECT COUNT(order_id) AS Total_Ordered_Pizzas FROM customer_orders;
+
+/* 2. How many unique customer orders were made? */
+SELECT COUNT(DISTINCT order_id) AS Unique_Customer_Orders FROM customer_orders;
+
+/* 3. How many successful orders were delivered by each runner? */
+SELECT runner_id, COUNT(runner_id) AS Total_Orders  FROM runner_orders
+WHERE cancellation IS NULL
+GROUP BY runner_id, cancellation;
+
+/* 4. How many of each type of pizza was delivered? */
+SELECT c.pizza_id ,  COUNT(c.pizza_id) AS Pizza_Type FROM customer_orders c RIGHT JOIN runner_orders r ON c.order_id = r.order_id
+WHERE r.cancellation IS NULL
+GROUP BY c.pizza_id;
