@@ -21,3 +21,10 @@ GROUP BY runner_id, cancellation;
 SELECT c.pizza_id ,  COUNT(c.pizza_id) AS Pizza_Type FROM customer_orders c RIGHT JOIN runner_orders r ON c.order_id = r.order_id
 WHERE r.cancellation IS NULL
 GROUP BY c.pizza_id;
+
+/* 5. How many Vegetarian and Meatlovers were ordered by each customer? */
+SELECT c.customer_id, 
+SUM(CASE WHEN p.pizza_name LIKE 'Meatlovers' THEN 1 ELSE 0 END)MeatLovers,
+SUM(CASE WHEN p.pizza_name LIKE 'Vegetarian' THEN 1 ELSE 0 END)Vegetarian
+FROM customer_orders c INNER JOIN pizza_names p ON c.pizza_id=p.pizza_id
+GROUP BY customer_id;
