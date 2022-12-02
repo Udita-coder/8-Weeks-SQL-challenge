@@ -1,3 +1,54 @@
+/* Data Cleaning (customer_orders) table */
+/* Updating datatype of order_time column from VARCHAR to DATETIME in customer_orders table */
+ALTER TABLE customer_orders
+ALTER COLUMN order_time DATETIME;
+
+/* Updating null and blank values to NULL values in customer_orders table */
+UPDATE customer_orders SET exclusions = NULL, extras = NULL WHERE order_id=1 ;
+UPDATE customer_orders SET exclusions = NULL, extras = NULL WHERE order_id=2 ;
+UPDATE customer_orders SET exclusions = NULL, extras = NULL WHERE order_id=3 ;
+UPDATE customer_orders SET extras = NULL WHERE order_id= 4;
+UPDATE customer_orders SET exclusions = NULL WHERE order_id= 5;
+UPDATE customer_orders SET exclusions = NULL, extras = NULL WHERE order_id=6 ;
+UPDATE customer_orders SET exclusions = NULL, extras = NULL WHERE order_id= 7;
+UPDATE customer_orders SET exclusions = NULL, extras = NULL WHERE order_id= 8;
+
+/* Data cleaning of runner_orders table */
+/* Updating null and blank values to NULL values in runner_orders table */
+UPDATE runner_orders SET cancellation = NULL WHERE order_id = 1;
+UPDATE runner_orders SET cancellation = NULL WHERE order_id = 2;
+UPDATE runner_orders SET pickup_time = NULL, distance = NULL, duration = NULL WHERE order_id = 6;
+UPDATE runner_orders SET cancellation = NULL WHERE order_id = 7;
+UPDATE runner_orders SET cancellation = NULL WHERE order_id = 8;
+UPDATE runner_orders SET pickup_time = NULL, distance = NULL, duration = NULL WHERE order_id = 9;
+UPDATE runner_orders SET cancellation = NULL WHERE order_id = 10;
+
+/* Cleaning distance column values in runner_orders table */
+UPDATE runner_orders SET distance = SUBSTRING(distance,0,3);
+SELECT * FROM runner_orders;
+
+/* Updating datatype of distance column from VARCHAR to INTEGER in runner_orders table */
+ALTER TABLE runner_orders
+ALTER COLUMN distance INTEGER;
+
+/* Changing column name distance to distance(KM) in runner_orders table */
+
+sp_RENAME 'runner_orders.distance' , 'distance (in KM)', 'COLUMN' ;
+
+/* Cleaning duration column values in runner_orders table */
+UPDATE runner_orders SET duration = SUBSTRING(duration,0,3);
+SELECT * FROM runner_orders;
+
+/* Updating datatype of duration column from VARCHAR to INTEGER in runner_orders table */
+ALTER TABLE runner_orders
+ALTER COLUMN duration INTEGER;
+
+/* Changing column name duration to duration (in minutes) in runner_orders table */
+
+sp_RENAME 'runner_orders.duration' , 'duration (in minutes)', 'COLUMN' ;
+
+
+
 /* PART - A PIZZA METRICS 
 
 1. How many pizzas were ordered? */
@@ -28,3 +79,16 @@ SUM(CASE WHEN p.pizza_name LIKE 'Meatlovers' THEN 1 ELSE 0 END)MeatLovers,
 SUM(CASE WHEN p.pizza_name LIKE 'Vegetarian' THEN 1 ELSE 0 END)Vegetarian
 FROM customer_orders c INNER JOIN pizza_names p ON c.pizza_id=p.pizza_id
 GROUP BY customer_id;
+
+/* 6. What was the maximum number of pizzas delivered in a single order? */
+SELECT  TOP 1 c.order_id, COUNT(c.order_id) AS Max_Pizza_Deleivered FROM customer_orders c INNER JOIN runner_orders r ON c.order_id=r.order_id 
+WHERE r.cancellation IS NULL
+GROUP BY c.order_id
+ORDER BY Max_Pizza_Deleivered DESC  ;
+
+* 7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes? */
+SELECT c.customer_id, SUM(CASE WHEN c.exclusions IS NULL THEN 1 ELSE 0 END)No_change,
+SUM(CASE WHEN c.exclusions IS NOT NULL THEN 1 ELSE 0 END)change FROM customer_orders c INNER JOIN runner_orders r
+ON c.order_id=r.order_id
+WHERE r.cancellation IS NULL
+GROUP BY c.customer_id;
