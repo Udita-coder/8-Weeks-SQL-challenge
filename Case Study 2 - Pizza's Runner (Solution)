@@ -109,4 +109,11 @@ GROUP BY DATEPART(HOUR,order_time);
 SELECT FORMAT(DATEADD(DAY,2,order_time),'dddd') AS Week_Day, COUNT(order_id) AS Pizza_Order_Each_Day, ROUND(100*COUNT(order_id)/SUM(COUNT(order_id)) OVER(),2) AS Total_Volume FROM customer_orders
 GROUP BY FORMAT(DATEADD(DAY,2,order_time),'dddd');
 
+/* PART-B Runner and Customer Experience */
+
+/* 1. How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01) */
+
+SELECT DATEPART(WEEK, DATEDIFF(DD,-4,registration_date))-1 AS Week_Day,COUNT(runner_id) AS No_of_runners FROM runners
+GROUP BY DATEPART(WEEK, DATEDIFF(DD,-4,registration_date))-1;
+
 
